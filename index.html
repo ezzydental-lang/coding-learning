@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clinic Morning Checklist</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f6fa;
+      margin: 0;
+      padding: 20px;
+    }
+    .card {
+      max-width: 480px;
+      margin: 0 auto;
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      margin-top: 0;
+      color: #1d4f7c;
+    }
+    label {
+      display: block;
+      padding: 12px 0;
+      font-size: 18px;
+      border-bottom: 1px solid #e5e5e5;
+      cursor: pointer;
+    }
+    input {
+      transform: scale(1.4);
+      margin-right: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Morning Checklist</h1>
+
+    <label><input type="checkbox"> Sterilization check</label>
+    <label><input type="checkbox"> Review today's patients</label>
+    <label><input type="checkbox"> Check implant stock</label>
+    <label><input type="checkbox"> Staff briefing</label>
+  </div>
+
+  <script>
+    // Find all the tick boxes on the page
+    var boxes = document.querySelectorAll('input[type="checkbox"]');
+
+    // Today's date as text, e.g. "2026-10-01" (uses the device's local time)
+    var d = new Date();
+    var today = d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0');
+
+    // Load saved data: the date it was saved and the ticks
+    var saved = null;
+    try {
+      saved = JSON.parse(localStorage.getItem('morningChecklist'));
+    } catch (e) {}
+
+    // Only use the saved ticks if they were saved today.
+    // On a new day (or old/missing data) we start with empty boxes.
+    var ticks = (saved && saved.date === today && saved.ticks) || [];
+
+    boxes.forEach(function (box, i) {
+      box.checked = ticks[i] === true;
+
+      // Every time a box is clicked, save today's date and the new state
+      box.addEventListener('change', function () {
+        var state = Array.from(boxes).map(function (b) { return b.checked; });
+        try {
+          localStorage.setItem('morningChecklist',
+            JSON.stringify({ date: today, ticks: state }));
+        } catch (e) {}
+      });
+    });
+  </script>
+</body>
+</html>
