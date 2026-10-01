@@ -45,5 +45,29 @@
     <label><input type="checkbox"> Check implant stock</label>
     <label><input type="checkbox"> Staff briefing</label>
   </div>
+
+  <script>
+    // Find all the tick boxes on the page
+    var boxes = document.querySelectorAll('input[type="checkbox"]');
+
+    // Load saved ticks (a list like [true, false, true, false])
+    var saved = [];
+    try {
+      saved = JSON.parse(localStorage.getItem('morningChecklist')) || [];
+    } catch (e) {}
+
+    // Put the saved ticks back on the page
+    boxes.forEach(function (box, i) {
+      box.checked = saved[i] === true;
+
+      // Every time a box is clicked, save the new state
+      box.addEventListener('change', function () {
+        var state = Array.from(boxes).map(function (b) { return b.checked; });
+        try {
+          localStorage.setItem('morningChecklist', JSON.stringify(state));
+        } catch (e) {}
+      });
+    });
+  </script>
 </body>
 </html>
