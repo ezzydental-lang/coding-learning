@@ -30,6 +30,21 @@
       border-bottom: 1px solid #e5e5e5;
       cursor: pointer;
     }
+    .date {
+      margin: -8px 0 12px;
+      color: #5a6b7b;
+      font-size: 16px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 18px;
+      font-size: 16px;
+      color: white;
+      background: #1d4f7c;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
     input {
       transform: scale(1.4);
       margin-right: 12px;
@@ -39,11 +54,14 @@
 <body>
   <div class="card">
     <h1>Morning Checklist</h1>
+    <p class="date" id="today-date"></p>
 
     <label><input type="checkbox"> Sterilization check</label>
     <label><input type="checkbox"> Review today's patients</label>
     <label><input type="checkbox"> Check implant stock</label>
     <label><input type="checkbox"> Staff briefing</label>
+
+    <button id="reset-btn" type="button">Reset checklist</button>
   </div>
 
   <script>
@@ -55,6 +73,12 @@
     var today = d.getFullYear() + '-' +
       String(d.getMonth() + 1).padStart(2, '0') + '-' +
       String(d.getDate()).padStart(2, '0');
+
+    // Show today's date at the top, e.g. "Thursday, 1 October 2026"
+    document.getElementById('today-date').textContent =
+      d.toLocaleDateString(undefined, {
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+      });
 
     // Load saved data: the date it was saved and the ticks
     var saved = null;
@@ -77,6 +101,15 @@
             JSON.stringify({ date: today, ticks: state }));
         } catch (e) {}
       });
+    });
+
+    // Reset button: untick everything and save the empty state
+    document.getElementById('reset-btn').addEventListener('click', function () {
+      boxes.forEach(function (box) { box.checked = false; });
+      try {
+        localStorage.setItem('morningChecklist',
+          JSON.stringify({ date: today, ticks: [false, false, false, false] }));
+      } catch (e) {}
     });
   </script>
 </body>
