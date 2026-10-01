@@ -50,21 +50,31 @@
     // Find all the tick boxes on the page
     var boxes = document.querySelectorAll('input[type="checkbox"]');
 
-    // Load saved ticks (a list like [true, false, true, false])
-    var saved = [];
+    // Today's date as text, e.g. "2026-10-01" (uses the device's local time)
+    var d = new Date();
+    var today = d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0');
+
+    // Load saved data: the date it was saved and the ticks
+    var saved = null;
     try {
-      saved = JSON.parse(localStorage.getItem('morningChecklist')) || [];
+      saved = JSON.parse(localStorage.getItem('morningChecklist'));
     } catch (e) {}
 
-    // Put the saved ticks back on the page
-    boxes.forEach(function (box, i) {
-      box.checked = saved[i] === true;
+    // Only use the saved ticks if they were saved today.
+    // On a new day (or old/missing data) we start with empty boxes.
+    var ticks = (saved && saved.date === today && saved.ticks) || [];
 
-      // Every time a box is clicked, save the new state
+    boxes.forEach(function (box, i) {
+      box.checked = ticks[i] === true;
+
+      // Every time a box is clicked, save today's date and the new state
       box.addEventListener('change', function () {
         var state = Array.from(boxes).map(function (b) { return b.checked; });
         try {
-          localStorage.setItem('morningChecklist', JSON.stringify(state));
+          localStorage.setItem('morningChecklist',
+            JSON.stringify({ date: today, ticks: state }));
         } catch (e) {}
       });
     });
